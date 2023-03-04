@@ -2,9 +2,9 @@
   "name": "sequelize-course",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon src/",
+    "dev": "nodemon src/index.ts",
     "build": "shx rm -rf dist/ && tsc",
     "start": "nodemon dist/",
     "debug": "npm run dev -- --inspect",
