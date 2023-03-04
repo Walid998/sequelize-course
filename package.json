@@ -8,17 +8,18 @@
     "build": "shx rm -rf dist/ && tsc",
     "start": "nodemon dist/",
     "debug": "npm run dev -- --inspect",
-    "lint": "eslint src/. test/. --config .eslintrc --ext .ts --fix",
-    "test": "npm run lint & npm run test:jest:coverage",
-    "test:jest": "jest --runInBand",
-    "test:jest:watch": "npm run test:jest -- --watch",
-    "test:jest:coverage": "npm run test:jest -- --coverage"
+    "lint": "eslint src/. tests/. --config .eslintrc --ext .ts --fix",
+    "test": "jest --runInBand",
+    "test:all": "npm run lint & npm run test:jest:coverage",
+    "test:jest:watch": "npm run test -- --watch",
+    "test:jest:coverage": "npm run test -- --coverage"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.4.0",
+    "@types/jsonwebtoken": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
     "babel-jest": "^29.4.3",
