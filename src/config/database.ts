@@ -1,3 +1,22 @@
+export enum DBEnvironment {
+  development = 'development',
+  test = 'test',
+}
+
+interface DBEnvironmentVars {
+  username: string;
+  password: string;
+  database: string;
+  host: string;
+  port: string | number;
+  dialect: string;
+}
+
+export interface DBConfig {
+  development: DBEnvironmentVars;
+  test: DBEnvironmentVars;
+}
+
 const { DB_PORT, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_DIALECT } =
   process.env;
 const {
@@ -9,7 +28,7 @@ const {
   DB_TEST_DIALECT,
 } = process.env;
 
-const sqlizeConfig = {
+const dbConfig: DBConfig = {
   development: {
     username: DB_USERNAME || 'postgres',
     password: DB_PASSWORD || 'postgres',
@@ -29,6 +48,6 @@ const sqlizeConfig = {
 };
 
 module.exports = {
-  development: sqlizeConfig.development,
-  test: sqlizeConfig.test,
+  development: dbConfig.development,
+  test: dbConfig.test,
 };
