@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import cls from 'cls-hooked';
 import { Options, Sequelize } from 'sequelize';
-import { DBConfig, DBEnvironment } from '../config/database';
+import { IDBConfig } from '../config/database';
+
+import { registerModels } from '../models';
 
 export class DB {
-  environment: DBEnvironment;
-  dbConfig: DBConfig;
+  environment: string;
+  dbConfig: IDBConfig;
   isTestEnv: boolean;
-  connection: Sequelize | undefined;
+  connection!: Sequelize;
 
-  constructor(environment: DBEnvironment, dbConfig: DBConfig) {
+  constructor(environment: string, dbConfig: IDBConfig) {
     this.environment = environment;
     this.dbConfig = dbConfig;
     this.isTestEnv = this.environment === 'test';
@@ -20,10 +22,10 @@ export class DB {
     // https://sequelize.org/docs/v6/other-topics/transactions/
     const namespace = cls.createNamespace('transactions-namespace');
     Sequelize.useCLS(namespace);
-
+    
     // Create Database Connection
     const { username, password, database, host, port, dialect } =
-      this.dbConfig[this.environment];
+      (this.dbConfig as any)[this.environment];
     this.connection = new Sequelize({
       database,
       username,
@@ -42,7 +44,7 @@ export class DB {
       console.log('Connection to database established successfully!!');
 
     // register models
-    // registerModels(this.connection);
+    registerModels(this.connection);
 
     // sync models
     this.sync();

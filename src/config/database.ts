@@ -12,7 +12,7 @@ interface DBEnvironmentVars {
   dialect: string;
 }
 
-export interface DBConfig {
+export interface IDBConfig {
   development: DBEnvironmentVars;
   test: DBEnvironmentVars;
 }
@@ -28,7 +28,7 @@ const {
   DB_TEST_DIALECT,
 } = process.env;
 
-const dbConfig: DBConfig = {
+export const dbConfig: IDBConfig = {
   development: {
     username: DB_USERNAME || 'postgres',
     password: DB_PASSWORD || 'postgres',
@@ -45,9 +45,4 @@ const dbConfig: DBConfig = {
     port: DB_TEST_PORT || 5441,
     dialect: DB_TEST_DIALECT || 'postgres',
   },
-};
-
-module.exports = {
-  development: dbConfig.development,
-  test: dbConfig.test,
 };

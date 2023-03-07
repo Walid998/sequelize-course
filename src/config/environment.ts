@@ -1,4 +1,4 @@
-export interface Environment {
+export interface IEnvironment {
   port: number | string;
   nodeEnv: string;
   saltRounds: number | string;
@@ -14,7 +14,7 @@ const {
   JWT_REFRESH_TOKEN_SECRET,
 } = process.env;
 
-const environment: Environment = {
+export const Environment: IEnvironment = {
   port: PORT || 8085,
   nodeEnv: NODE_ENV || 'production',
   saltRounds: SALT_ROUNDS || 10,
@@ -26,4 +26,3 @@ const environment: Environment = {
     'cb45a206b09f94fd73165bb72613056eb818f2d84c7b5ba6d361406af77ed8c8',
 };
 
-export default environment;
