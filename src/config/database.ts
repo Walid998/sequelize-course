@@ -46,3 +46,8 @@ export const dbConfig: IDBConfig = {
     dialect: DB_TEST_DIALECT || 'postgres',
   },
 };
+
+module.exports = {
+  development: dbConfig.development,
+  test: dbConfig.test,
+};

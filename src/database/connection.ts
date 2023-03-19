@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import cls from 'cls-hooked';
 import { Options, Sequelize } from 'sequelize';
 import { IDBConfig } from '../config/database';
-
 import { registerModels } from '../models';
 
 export class DB {
@@ -38,7 +36,7 @@ export class DB {
 
     // verify database connection
     await this.connection.authenticate({ logging: false });
-
+    
     // test environment
     if (this.isTestEnv)
       console.log('Connection to database established successfully!!');
