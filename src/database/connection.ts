@@ -1,15 +1,15 @@
 import cls from 'cls-hooked';
 import { Options, Sequelize } from 'sequelize';
-import { IDBConfig } from '../config/database';
+import  DBConfig  = require( '../config/database');
 import { registerModels } from '../models';
 
 export class DB {
   environment: string;
-  dbConfig: IDBConfig;
+  dbConfig: typeof DBConfig;
   isTestEnv: boolean;
   connection!: Sequelize;
 
-  constructor(environment: string, dbConfig: IDBConfig) {
+  constructor(environment: string, dbConfig: typeof DBConfig) {
     this.environment = environment;
     this.dbConfig = dbConfig;
     this.isTestEnv = this.environment === 'test';

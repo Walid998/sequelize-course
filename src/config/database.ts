@@ -1,8 +1,3 @@
-export enum DBEnvironment {
-  development = 'development',
-  test = 'test',
-}
-
 interface DBEnvironmentVars {
   username: string;
   password: string;
