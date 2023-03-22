@@ -10,7 +10,7 @@ export default (sequelize: Sequelize) => {
   RefreshToken.init(
     {
       token: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
     },
