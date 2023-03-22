@@ -6,11 +6,11 @@ export default (sequelize: Sequelize) => {
   class User extends Model {
     email?: string;
     password?: string;
-    roles?: any;
+    static roles?: any;
     username?: string;
     firstName?: string;
     lastName?: string;
-    refreshToken?: string;
+    static refreshToken?: Text;
     // constructor (){
 
     // }
@@ -31,24 +31,25 @@ export default (sequelize: Sequelize) => {
       username: string,
       firstName: string,
       lastName: string,
-      refreshToken: string
+      refreshToken: Text
     ) {
-      return sequelize.transaction(async () => {
+      return sequelize.transaction(() => {
         let rolesToSave: any[] = [];
         if(roles && Array.isArray(roles)){
           rolesToSave = roles.map(role => ({role}));
         }
-        await User.create({
+        return User.create({
           email,
           password,
           username,
           firstName,
           lastName,
           roles: rolesToSave,
-          refreshToken: {token: refreshToken},
-        }
-        // {include: [User.refreshToken, User.roles]}
-        );}
+          RefreshToken: {token: refreshToken},
+        },
+        {include: [User.refreshToken, User.roles]}
+        );
+      }
       );
     }
   }
@@ -99,5 +100,10 @@ export default (sequelize: Sequelize) => {
     const hashedPassword = await User.hashPassword(user.password!);
     user.password = hashedPassword;
   });
+
+  User.afterCreate(async (user: User) => {
+    delete user.dataValues.password;
+  });
+
   return User;
 };

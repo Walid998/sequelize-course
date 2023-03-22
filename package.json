@@ -12,11 +12,7 @@
     "test": "jest --runInBand",
     "test:all": "npm run lint & npm run test:jest:coverage",
     "test:jest:watch": "npm run test -- --watch",
-    "test:jest:coverage": "npm run test -- --coverage",
-    "makemigration": "sequelize migration:generate",
-    "db:migrate": "sequelize db:migrate",
-    "db:undo": "sequelize db:migrate:undo"
-
+    "test:jest:coverage": "npm run test -- --coverage"
   },
   "keywords": [],
   "author": "",
