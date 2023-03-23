@@ -1,7 +1,7 @@
 import cls from 'cls-hooked';
 import { Options, Sequelize } from 'sequelize';
 import  DBConfig  = require( '../config/database');
-import { registerModels } from '../models';
+import { ModelsRegistration } from '../models';
 
 export class DB {
   environment: string;
@@ -42,7 +42,7 @@ export class DB {
       console.log('Connection to database established successfully!!');
 
     // register models
-    registerModels(this.connection);
+    ModelsRegistration.register(this.connection);
 
     // sync models
     this.sync();
