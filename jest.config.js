@@ -7,6 +7,11 @@ module.exports = {
   },
   collectCoverage: true,
   coverageReporters: ['html','text-summary'],
+  collectCoverageFrom: [
+    '**/*.{ts,tsx}',
+    '!**/node_modules/**',
+    '!**/tests/**',
+  ],
   bail: 1,
   verbose: true
 };
