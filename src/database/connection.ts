@@ -1,6 +1,6 @@
 import cls from 'cls-hooked';
 import { Options, Sequelize } from 'sequelize';
-import  DBConfig  = require( '../config/database');
+import  DBConfig  = require('../config/database');
 import { ModelsRegistration } from '../models';
 
 export class DB {
@@ -52,13 +52,27 @@ export class DB {
     await this.connection?.close();
   }
 
+  async isConnected() {
+    try {
+      await this.connection?.authenticate();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async sync() {
     // force is a suitable choise while testing, check the this link
     // https://sequelize.org/docs/v6/core-concepts/model-basics/
-    await this.connection?.sync({
-      logging: false,
-      force: this.isTestEnv,
-    });
+    try {
+      await this.connection?.sync({
+        logging: false,
+        force: this.isTestEnv,
+      });
+    } catch (error) {
+      console.log('Error syncing database:', error);
+      throw error;
+    }
 
     if (!this.isTestEnv) console.log('Connection Synced Successfully');
   }

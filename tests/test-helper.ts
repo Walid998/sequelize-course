@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import '../src/config';
 import { DB } from '../src/database';
-import { dbConfig } from '../src/config/database';
+const dbConfig = require('../src/config/database');
 
 let db: DB;
 
@@ -12,7 +13,10 @@ export class testHelper {
   }
 
   static async stopDB() {
-    await db.disconnect();
+    const isConnected = await db.isConnected();
+    if (db && isConnected) {
+      await db.disconnect();
+    }
   }
 
   static async syncDB() {

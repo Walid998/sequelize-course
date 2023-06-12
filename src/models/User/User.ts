@@ -53,11 +53,11 @@ export class User
     });
   }
   comparePasswords = async (password: string) => {
-    return bycrpt.compare(this.password!, password);
+    return await bycrpt.compare(password, this.password!);
   };
 
   static async hashPassword(password: string) {
-    return bycrpt.hash(password, Environment.saltRounds);
+    return await bycrpt.hash(password, Environment.saltRounds);
   }
 
   static initModel(sequelize: Sequelize) {
