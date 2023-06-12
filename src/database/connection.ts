@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import cls from 'cls-hooked';
 import { Options, Sequelize } from 'sequelize';
-import { IDBConfig } from '../config/database';
-
-import { registerModels } from '../models';
+import  DBConfig  = require('../config/database');
+import { ModelsRegistration } from '../models';
 
 export class DB {
   environment: string;
-  dbConfig: IDBConfig;
+  dbConfig: typeof DBConfig;
   isTestEnv: boolean;
   connection!: Sequelize;
 
-  constructor(environment: string, dbConfig: IDBConfig) {
+  constructor(environment: string, dbConfig: typeof DBConfig) {
     this.environment = environment;
     this.dbConfig = dbConfig;
     this.isTestEnv = this.environment === 'test';
@@ -38,13 +36,13 @@ export class DB {
 
     // verify database connection
     await this.connection.authenticate({ logging: false });
-
+    
     // test environment
     if (this.isTestEnv)
       console.log('Connection to database established successfully!!');
 
     // register models
-    registerModels(this.connection);
+    ModelsRegistration.register(this.connection);
 
     // sync models
     this.sync();
@@ -54,13 +52,27 @@ export class DB {
     await this.connection?.close();
   }
 
+  async isConnected() {
+    try {
+      await this.connection?.authenticate();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async sync() {
     // force is a suitable choise while testing, check the this link
     // https://sequelize.org/docs/v6/core-concepts/model-basics/
-    await this.connection?.sync({
-      logging: false,
-      force: this.isTestEnv,
-    });
+    try {
+      await this.connection?.sync({
+        logging: false,
+        force: this.isTestEnv,
+      });
+    } catch (error) {
+      console.log('Error syncing database:', error);
+      throw error;
+    }
 
     if (!this.isTestEnv) console.log('Connection Synced Successfully');
   }

@@ -1,7 +1,7 @@
 import './config';
 import { DB } from './database';
 import { Environment } from './config/environment';
-import { dbConfig } from './config/database';
+import dbConfig = require('./config/database');
 
 async function start () {
   try {

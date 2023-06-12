@@ -1,8 +1,3 @@
-export enum DBEnvironment {
-  development = 'development',
-  test = 'test',
-}
-
 interface DBEnvironmentVars {
   username: string;
   password: string;
@@ -45,4 +40,9 @@ export const dbConfig: IDBConfig = {
     port: DB_TEST_PORT || 5441,
     dialect: DB_TEST_DIALECT || 'postgres',
   },
+};
+
+module.exports = {
+  development: dbConfig.development,
+  test: dbConfig.test,
 };
