@@ -32,7 +32,7 @@ export class DB {
       port,
       dialect,
       logging: this.isTestEnv ? false : console.log,
-    } as Options);
+    });
 
     // verify database connection
     await this.connection.authenticate({ logging: false });
@@ -46,6 +46,8 @@ export class DB {
 
     // sync models
     this.sync();
+
+    return this.connection;
   }
 
   async disconnect() {

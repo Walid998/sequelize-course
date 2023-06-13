@@ -55,9 +55,9 @@ export class User
   comparePasswords = async (password: string) => {
     return await bycrpt.compare(password, this.password!);
   };
-
   static async hashPassword(password: string) {
-    return await bycrpt.hash(password, Environment.saltRounds);
+    const hashedPassword = await bycrpt.hash(password, Number(Environment.saltRounds));
+    return hashedPassword;
   }
 
   static initModel(sequelize: Sequelize) {

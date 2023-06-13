@@ -8,26 +8,14 @@ describe('User', () => {
 
   beforeAll(async () => {
     // Set up a mock Sequelize instance
-    sequelize = new Sequelize({
-      username: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
-      host: 'localhost',
-      port: 5441,
-      dialect: 'postgres',
-    });
-
-    // Initialize the User model
-    User.initModel(sequelize);
-    await sequelize.sync({ force: true });
-
+    sequelize = await testHelper.startDB() as any;
+    
   });
 
   afterAll(async () => {
     // Close the Sequelize connection after all tests have completed
-    await sequelize.close();
+    await testHelper.stopDB();
   });
-
   describe('createNewUser', () => {
     it('should create a new user', async () => {
       // Create a mock user object
