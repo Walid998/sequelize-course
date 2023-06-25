@@ -1,9 +1,9 @@
 import { testHelper } from '../test-helper';
 import { Sequelize } from 'sequelize';
 import { User, UserAttributes } from '../../src/models/User/User';
-import { Role } from '../../src/models/Role/Role';
+import { RefreshToken } from '../../src/models/RefreshToken/RefreshToken';
 
-describe('Role', () => {
+describe('RefreshToken', () => {
   let sequelize: Sequelize;
 
   beforeAll(async () => {
@@ -16,7 +16,7 @@ describe('Role', () => {
     await testHelper.stopDB();
   });
   describe('Test onDelete:\'CASCADE\'', () => {
-    it('should delete the roles records if the user is deleted', async () => {
+    it('should delete the refreshToken record if the user is deleted', async () => {
       // Create a mock user object
       const userAttributes: UserAttributes = {
         email: 'test@example.com',
@@ -33,11 +33,11 @@ describe('Role', () => {
         sequelize
       );
 
-      let rolesCount = await Role.count();
-      expect(user.roles?.length).toBe(rolesCount);
+      let refreshTokenCount = await RefreshToken.count();
+      expect(refreshTokenCount).toBe(1);
       await user.destroy();
-      rolesCount = await Role.count();
-      expect(rolesCount).toBe(0);
+      refreshTokenCount = await RefreshToken.count();
+      expect(refreshTokenCount).toBe(0);
     });
   });
 });
