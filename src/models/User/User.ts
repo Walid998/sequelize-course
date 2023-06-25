@@ -6,14 +6,14 @@ import { Role } from '../Role/Role';
 import { RefreshToken } from '../RefreshToken/RefreshToken';
 
 export interface UserAttributes {
-  id: number;
+  id?: number;
   email?: string;
   password?: string;
   roles?: any[];
   username?: string;
   firstName?: string;
   lastName?: string;
-  refreshToken?: {token: string};
+  refreshToken?: { token: string };
 }
 
 type UserCreationAttributes = Optional<UserAttributes, 'id'>;
@@ -29,7 +29,7 @@ export class User
   username?: string | undefined;
   firstName?: string | undefined;
   lastName?: string | undefined;
-  refreshToken?: {token: string } | undefined;
+  refreshToken?: { token: string } | undefined;
 
   static async createNewUser(
     userAttributes: UserAttributes,
@@ -59,7 +59,10 @@ export class User
     return await bycrpt.compare(password, this.password!);
   };
   static async hashPassword(password: string) {
-    const hashedPassword = await bycrpt.hash(password, Number(Environment.saltRounds));
+    const hashedPassword = await bycrpt.hash(
+      password,
+      Number(Environment.saltRounds)
+    );
     return hashedPassword;
   }
 
@@ -71,8 +74,10 @@ export class User
       scopes: { withPassword: { attributes: { include: ['password'] } } },
     });
     User.beforeSave(async (user: User) => {
-      const hashedPassword = await User.hashPassword(user.password!);
-      user.password = hashedPassword;
+      if (user.password) {
+        const hashedPassword = await User.hashPassword(user.password);
+        user.password = hashedPassword;
+      }
     });
 
     User.afterCreate(async (user: User) => {

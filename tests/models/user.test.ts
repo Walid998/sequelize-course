@@ -26,7 +26,7 @@ describe('User', () => {
         firstName: 'Test',
         lastName: 'User',
         roles: ['admin', 'user'],
-        refreshToken: {token: 'test-referesh-token'},
+        refreshToken: { token: 'test-referesh-token' },
       };
 
       // Call the createNewUser method and verify that it returns a new user object
@@ -34,7 +34,7 @@ describe('User', () => {
         userAttributes as UserAttributes,
         sequelize
       );
-      
+
       expect(user.id).toBeDefined();
       expect(user.email).toBe(userAttributes.email);
       expect(user.username).toBe(userAttributes.username);
@@ -58,32 +58,181 @@ describe('User', () => {
       expect(userRoles).toStrictEqual(['admin', 'user']);
 
       // check saved refreshToken
-      expect(user.refreshToken?.token).toStrictEqual(userAttributes.refreshToken?.token);
+      expect(user.refreshToken?.token).toStrictEqual(
+        userAttributes.refreshToken?.token
+      );
+    });
+  });
 
+  describe('test createNewUser validations', () => {
+    it('should return an error if the email is invalid', async () => {
+      const userAttributes: UserAttributes = {
+        username: 'testuser',
+        email: 'example.com',
+        password: 'password123',
+      };
+
+      let error: any;
+      try {
+        await User.createNewUser(userAttributes as UserAttributes, sequelize);
+      } catch (err) {
+        error = err;
+      }
+
+      expect(error).toBeDefined();
+      expect(error.errors.length).toBe(1);
+      expect(error.errors[0].path).toBe('email');
+      expect(error.errors[0].message).toBe('This is not a valid email address');
+    });
+    it('should return an error if the email is mull', async () => {
+      const userAttributes: UserAttributes = {
+        username: 'testuser',
+        password: 'password123',
+      };
+
+      let error: any;
+      try {
+        await User.createNewUser(userAttributes as UserAttributes, sequelize);
+      } catch (err) {
+        error = err;
+      }
+
+      expect(error).toBeDefined();
+      expect(error.errors.length).toBe(1);
+      expect(error.errors[0].path).toBe('email');
+      expect(error.errors[0].message).toBe('Email is required');
+    });
+    it('should return an error if the username less than 2', async () => {
+      const userAttributes: UserAttributes = {
+        username: 't',
+        email: 'test1@example.com',
+        password: 'password123',
+      };
+
+      let error: any;
+      try {
+        await User.createNewUser(userAttributes as UserAttributes, sequelize);
+      } catch (err) {
+        error = err;
+      }
+
+      expect(error).toBeDefined();
+      expect(error.errors.length).toBe(1);
+      expect(error.errors[0].path).toBe('username');
+      expect(error.errors[0].message).toBe(
+        'the username length should be from 2 to 20 chars'
+      );
+    });
+    it('should return an error if the username greater than 20', async () => {
+      const userAttributes: UserAttributes = {
+        username: 't'.repeat(21),
+        email: 'test2@example.com',
+        password: 'password123',
+      };
+
+      let error: any;
+      try {
+        await User.createNewUser(userAttributes as UserAttributes, sequelize);
+      } catch (err) {
+        error = err;
+      }
+
+      expect(error).toBeDefined();
+      expect(error.errors.length).toBe(1);
+      expect(error.errors[0].path).toBe('username');
+      expect(error.errors[0].message).toBe(
+        'the username length should be from 2 to 20 chars'
+      );
+    });
+    it('should return an error if the username duplicated', async () => {
+      const userAttributes1: UserAttributes = {
+        email: 'test4@example.com',
+        password: 'password123',
+        username: 'testuser',
+        firstName: 'Test',
+        lastName: 'User',
+        roles: ['admin', 'user'],
+        refreshToken: { token: 'test-referesh-token' },
+      };
+      let error: any;
+      try {
+        await User.createNewUser(userAttributes1 as UserAttributes, sequelize);
+      } catch (err) {
+        error = err;
+      }
+
+      try {
+        await User.createNewUser(userAttributes1 as UserAttributes, sequelize);
+      } catch (err) {
+        error = err;
+      }
+
+      expect(error).toBeDefined();
+      expect(error.errors.length).toBe(1);
+      expect(error.errors[0].path).toBe('username');
+      expect(error.errors[0].message).toBe('username must be unique');
     });
   });
 
   describe('comparePasswords', () => {
-    it('should compare the passwords correctly', async () => {
-      // Create a mock user object with a hashed password
-      const hashedPassword = await bycrpt.hash('password123', 10);
-      const user = new User({
-        email: 'test@example.com',
-        password: hashedPassword,
-        username: 'testuser',
+    let user: User;
+
+    beforeAll(async () => {
+      const userAttributes: UserAttributes = {
+        email: 'userPassword@example.com',
+        password: 'password123',
+        username: 'userPassword',
         firstName: 'Test',
         lastName: 'User',
-      });
-
-      // Call the comparePasswords method and verify that it returns true for the correct password
-      const isPasswordMatch = await user.comparePasswords('password123');
-      expect(isPasswordMatch).toBe(true);
-
-      // Verify that it returns false for an incorrect password
-      const isIncorrectPasswordMatch = await user.comparePasswords(
-        'wrongpassword'
+        roles: ['admin', 'user'],
+        refreshToken: { token: 'test-referesh-token' },
+      };
+      user = await User.createNewUser(
+        userAttributes as UserAttributes,
+        sequelize
       );
-      expect(isIncorrectPasswordMatch).toBe(false);
+    });
+    it('should return true if the password is correct', async () => {
+      const returndUser = await User.scope('withPassword').findByPk(user.id);
+      const isPasswordMatch = await returndUser!.comparePasswords('password123');
+      expect(isPasswordMatch).toBe(true);
+    });
+    it('should return false if the password is incorrect', async () => {
+      const returndUser = await User.scope('withPassword').findByPk(user.id);
+      const isPasswordMatch = await returndUser!.comparePasswords('incorrectPassword');
+      expect(isPasswordMatch).toBe(false);
+    });
+  });
+
+  describe('Scopes', () => {
+    let user: User;
+    beforeAll(async () => {
+      const userAttributes: UserAttributes = {
+        email: 'scopeUser@example.com',
+        password: 'password123',
+        username: 'scopeUser',
+        firstName: 'Test',
+        lastName: 'User',
+        roles: ['admin', 'user'],
+        refreshToken: { token: 'test-referesh-token' },
+      };
+      user = await User.createNewUser(
+        userAttributes as UserAttributes,
+        sequelize
+      );
+    });
+    describe('Default Scope', () => {
+      it('it should return a user without password', async () => {
+        const returndUser = await User.findByPk(user.id);
+        expect(returndUser?.password).toBeUndefined();
+      });
+    });
+
+    describe('Custom Scope', () => {
+      it('it should return a user with password', async () => {
+        const returndUser = await User.scope('withPassword').findByPk(user.id);
+        expect(returndUser?.password).toEqual(expect.any(String));
+      });
     });
   });
 });
