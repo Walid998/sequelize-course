@@ -5,6 +5,10 @@
 * NVM
 * Docker
 
+## Run The Application
+```
+docker-compose up -d // -d or --detach runs docker in the background
+```
 ## Migrations Commands
 
 ```

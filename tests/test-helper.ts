@@ -8,8 +8,7 @@ let db: DB;
 export class testHelper {
   static async startDB() {
     db = new DB('test', dbConfig);
-    await db.connect();
-    return db;
+    return await db.connect();
   }
 
   static async stopDB() {
@@ -17,9 +16,5 @@ export class testHelper {
     if (db && isConnected) {
       await db.disconnect();
     }
-  }
-
-  static async syncDB() {
-    await db.sync();
   }
 }

@@ -19,5 +19,13 @@ export const REFRESH_TOKEN_MODEL_ATTRIBUTES: ModelAttributes<RefreshToken, Refre
   updatedAt: {
     type: DataTypes.DATE,
     allowNull: false,
-  }
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    },
+  },
 };

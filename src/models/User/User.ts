@@ -2,16 +2,18 @@ import { Model, Optional, Sequelize } from 'sequelize';
 import { USER_MODEL_ATTRIBUTES } from './User.schema';
 import bycrpt from 'bcrypt';
 import { Environment } from '../../config/environment';
+import { Role } from '../Role/Role';
+import { RefreshToken } from '../RefreshToken/RefreshToken';
 
 export interface UserAttributes {
-  id: number;
+  id?: number;
   email?: string;
   password?: string;
   roles?: any[];
   username?: string;
   firstName?: string;
   lastName?: string;
-  refreshToken?: Text;
+  refreshToken?: { token: string };
 }
 
 type UserCreationAttributes = Optional<UserAttributes, 'id'>;
@@ -27,7 +29,7 @@ export class User
   username?: string | undefined;
   firstName?: string | undefined;
   lastName?: string | undefined;
-  refreshToken?: Text | undefined;
+  refreshToken?: { token: string } | undefined;
 
   static async createNewUser(
     userAttributes: UserAttributes,
@@ -38,6 +40,7 @@ export class User
       if (userAttributes.roles && Array.isArray(userAttributes.roles)) {
         rolesToSave = userAttributes.roles.map((role) => ({ role }));
       }
+
       return User.create(
         {
           email: userAttributes.email,
@@ -45,19 +48,22 @@ export class User
           username: userAttributes.username,
           firstName: userAttributes.firstName,
           lastName: userAttributes.lastName,
-          // roles: rolesToSave,
-          // refreshToken: {token: userAttributes.refreshToken},
+          roles: rolesToSave,
+          refreshToken: userAttributes.refreshToken,
         },
-        // { include: [{}, {}] }
+        { include: [Role, RefreshToken] }
       );
     });
   }
   comparePasswords = async (password: string) => {
     return await bycrpt.compare(password, this.password!);
   };
-
   static async hashPassword(password: string) {
-    return await bycrpt.hash(password, Environment.saltRounds);
+    const hashedPassword = await bycrpt.hash(
+      password,
+      Number(Environment.saltRounds)
+    );
+    return hashedPassword;
   }
 
   static initModel(sequelize: Sequelize) {
@@ -68,8 +74,10 @@ export class User
       scopes: { withPassword: { attributes: { include: ['password'] } } },
     });
     User.beforeSave(async (user: User) => {
-      const hashedPassword = await User.hashPassword(user.password!);
-      user.password = hashedPassword;
+      if (user.password) {
+        const hashedPassword = await User.hashPassword(user.password);
+        user.password = hashedPassword;
+      }
     });
 
     User.afterCreate(async (user: User) => {
@@ -78,7 +86,7 @@ export class User
   }
 
   static associate(models: any) {
-    User.hasOne(models.refresh_tokens);
+    User.hasOne(models.refreshTokens);
     User.hasMany(models.roles);
   }
 }

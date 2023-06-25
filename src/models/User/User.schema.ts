@@ -16,6 +16,9 @@ export const USER_MODEL_ATTRIBUTES: ModelAttributes<User, UserAttributes> = {
       isEmail: {
         msg: 'This is not a valid email address',
       },
+      notNull:{
+        msg: 'Email is required'
+      }
     },
   },
   password: {
