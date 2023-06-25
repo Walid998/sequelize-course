@@ -8,8 +8,7 @@ describe('User', () => {
 
   beforeAll(async () => {
     // Set up a mock Sequelize instance
-    sequelize = await testHelper.startDB() as any;
-    
+    sequelize = (await testHelper.startDB()) as any;
   });
 
   afterAll(async () => {
@@ -26,7 +25,8 @@ describe('User', () => {
         username: 'testuser',
         firstName: 'Test',
         lastName: 'User',
-        roles: ['admin']
+        roles: ['admin', 'user'],
+        refreshToken: {token: 'test-referesh-token'},
       };
 
       // Call the createNewUser method and verify that it returns a new user object
@@ -34,6 +34,7 @@ describe('User', () => {
         userAttributes as UserAttributes,
         sequelize
       );
+      
       expect(user.id).toBeDefined();
       expect(user.email).toBe(userAttributes.email);
       expect(user.username).toBe(userAttributes.username);
@@ -50,6 +51,15 @@ describe('User', () => {
         );
         expect(isPasswordMatch).resolves.toBe(true);
       }
+
+      // check saved roles
+      expect(user.roles?.length).toBe(2);
+      const userRoles = user.roles?.map((role) => role.role);
+      expect(userRoles).toStrictEqual(['admin', 'user']);
+
+      // check saved refreshToken
+      expect(user.refreshToken?.token).toStrictEqual(userAttributes.refreshToken?.token);
+
     });
   });
 

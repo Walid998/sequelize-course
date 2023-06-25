@@ -22,7 +22,7 @@ export class RefreshToken
   userId?: number | undefined;
   
   static initModel(sequelize: Sequelize) {
-    RefreshToken.init(REFRESH_TOKEN_MODEL_ATTRIBUTES, { sequelize, modelName: 'refresh_tokens' });
+    RefreshToken.init(REFRESH_TOKEN_MODEL_ATTRIBUTES, { sequelize, modelName: 'refreshTokens' });
   }
 
   static associate(models: any) {

@@ -2,6 +2,8 @@ import { Model, Optional, Sequelize } from 'sequelize';
 import { USER_MODEL_ATTRIBUTES } from './User.schema';
 import bycrpt from 'bcrypt';
 import { Environment } from '../../config/environment';
+import { Role } from '../Role/Role';
+import { RefreshToken } from '../RefreshToken/RefreshToken';
 
 export interface UserAttributes {
   id: number;
@@ -11,7 +13,7 @@ export interface UserAttributes {
   username?: string;
   firstName?: string;
   lastName?: string;
-  refreshToken?: Text;
+  refreshToken?: {token: string};
 }
 
 type UserCreationAttributes = Optional<UserAttributes, 'id'>;
@@ -27,7 +29,7 @@ export class User
   username?: string | undefined;
   firstName?: string | undefined;
   lastName?: string | undefined;
-  refreshToken?: Text | undefined;
+  refreshToken?: {token: string } | undefined;
 
   static async createNewUser(
     userAttributes: UserAttributes,
@@ -38,6 +40,7 @@ export class User
       if (userAttributes.roles && Array.isArray(userAttributes.roles)) {
         rolesToSave = userAttributes.roles.map((role) => ({ role }));
       }
+
       return User.create(
         {
           email: userAttributes.email,
@@ -45,10 +48,10 @@ export class User
           username: userAttributes.username,
           firstName: userAttributes.firstName,
           lastName: userAttributes.lastName,
-          // roles: rolesToSave,
-          // refreshToken: {token: userAttributes.refreshToken},
+          roles: rolesToSave,
+          refreshToken: userAttributes.refreshToken,
         },
-        // { include: [{}, {}] }
+        { include: [Role, RefreshToken] }
       );
     });
   }
@@ -78,7 +81,7 @@ export class User
   }
 
   static associate(models: any) {
-    User.hasOne(models.refresh_tokens);
+    User.hasOne(models.refreshTokens);
     User.hasMany(models.roles);
   }
 }
